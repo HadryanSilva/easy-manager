@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - app
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - app
+  easy-api:
+    build:
+      context: easy-api
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - app
+  easy-sales:
+    build:
+      context: easy-sales
+      dockerfile: Dockerfile
+    networks:
+      - app
+    depends_on:
+      - postgres
+      - rabbitmq
+  easy-stock:
+    build:
+      context: easy-stock
+      dockerfile: Dockerfile
+    networks:
+      - app
+    depends_on:
+      - postgres
+      - rabbitmq
+  easy-notification:
+    build:
+      context: easy-notification
+      dockerfile: Dockerfile
+    networks:
+      - app
+    depends_on:
+      - postgres
+      - rabbitmq
+      
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  postgres:
