@@ -4,8 +4,10 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_SCRIPTS: /var/lib/postgresql/data/init-db.sql
     volumes:
       - postgres:/data/postgres
+      - ./scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     networks:
@@ -64,4 +66,5 @@ networks:
     driver: bridge
 
 volumes:
+  scripts:
   postgres:
